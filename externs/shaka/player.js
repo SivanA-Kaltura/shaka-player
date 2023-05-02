@@ -683,14 +683,60 @@ shaka.extern.AdvancedDrmConfiguration;
 
 /**
  * @typedef {{
+ *   sessionId: string,
+ *   sessionType: string,
+ *   initData: ?Uint8Array,
+ *   initDataType: ?string
+ * }}
+ *
+ * @description
+ * DRM Session Metadata for an active session
+ *
+ * @property {string} sessionId
+ *   Session id
+ * @property {string} sessionType
+ *   Session type
+ * @property {?Uint8Array} initData
+ *   Initialization data in the format indicated by initDataType.
+ * @property {string} initDataType
+ *   A string to indicate what format initData is in.
+ * @exportDoc
+ */
+shaka.extern.DrmSessionMetadata;
+
+
+/**
+ * @typedef {{
+ *   sessionId: string,
+ *   initData: ?Uint8Array,
+ *   initDataType: ?string
+ * }}
+ *
+ * @description
+ * DRM Session Metadata for saved persistent session
+ *
+ * @property {string} sessionId
+ *   Session id
+ * @property {?Uint8Array} initData
+ *   Initialization data in the format indicated by initDataType.
+ * @property {?string} initDataType
+ *   A string to indicate what format initData is in.
+ * @exportDoc
+ */
+shaka.extern.PersistentSessionMetadata;
+
+
+/**
+ * @typedef {{
  *   retryParameters: shaka.extern.RetryParameters,
  *   servers: !Object.<string, string>,
  *   clearKeys: !Object.<string, string>,
  *   delayLicenseRequestUntilPlayed: boolean,
+ *   persistentSessionOnlinePlayback: boolean,
+ *   persistentSessionsMetadata:
+ *       !Array.<shaka.extern.PersistentSessionMetadata>,
  *   advanced: Object.<string, shaka.extern.AdvancedDrmConfiguration>,
- *   initDataTransform:
- *       ((function(!Uint8Array, string, ?shaka.extern.DrmInfo):!Uint8Array)|
- *         undefined),
+ *   initDataTransform:(shaka.extern.InitDataTransform|undefined),
  *   logLicenseExchange: boolean,
  *   updateExpirationTime: number,
  *   preferredKeySystems: !Array.<string>,
@@ -713,14 +759,18 @@ shaka.extern.AdvancedDrmConfiguration;
  *   <i>Defaults to false.</i> <br>
  *   True to configure drm to delay sending a license request until a user
  *   actually starts playing content.
+ * @property {boolean} persistentSessionOnlinePlayback
+ *   <i>Defaults to false.</i> <br>
+ *   True to configure drm to try playback with given persistent session ids
+ *   before requesting a license. Also prevents the session removal at playback
+ *   stop, as-to be able to re-use it later.
+ * @property {!Array.<PersistentSessionMetadata>} persistentSessionsMetadata
+ *   Persistent sessions metadata to load before starting playback
  * @property {Object.<string, shaka.extern.AdvancedDrmConfiguration>} advanced
  *   <i>Optional.</i> <br>
  *   A dictionary which maps key system IDs to advanced DRM configuration for
  *   those key systems.
- * @property
- *     {((function(!Uint8Array, string, ?shaka.extern.DrmInfo):!Uint8Array)|
- *        undefined)}
- *   initDataTransform
+ * @property {shaka.extern.InitDataTransform|undefined} initDataTransform
  *   <i>Optional.</i><br>
  *   If given, this function is called with the init data from the
  *   manifest/media and should return the (possibly transformed) init data to
@@ -752,6 +802,17 @@ shaka.extern.AdvancedDrmConfiguration;
  * @exportDoc
  */
 shaka.extern.DrmConfiguration;
+
+/**
+ * @typedef {function(!Uint8Array, string, ?shaka.extern.DrmInfo):!Uint8Array}
+ *
+ * @description
+ * A callback function to handle custom content ID signaling for FairPlay
+ * content.
+ *
+ * @exportDoc
+ */
+shaka.extern.InitDataTransform;
 
 
 /**
@@ -935,7 +996,8 @@ shaka.extern.MssManifestConfiguration;
  *   segmentRelativeVttTiming: boolean,
  *   dash: shaka.extern.DashManifestConfiguration,
  *   hls: shaka.extern.HlsManifestConfiguration,
- *   mss: shaka.extern.MssManifestConfiguration
+ *   mss: shaka.extern.MssManifestConfiguration,
+ *   raiseFatalErrorOnManifestUpdateRequestFailure: boolean
  * }}
  *
  * @property {shaka.extern.RetryParameters} retryParameters
@@ -975,6 +1037,9 @@ shaka.extern.MssManifestConfiguration;
  *   Advanced parameters used by the HLS manifest parser.
  * @property {shaka.extern.MssManifestConfiguration} mss
  *   Advanced parameters used by the MSS manifest parser.
+ * @property {boolean} raiseFatalErrorOnManifestUpdateRequestFailure
+ *   If true, manifest update request failures will cause a fatal errror.
+ *   Defaults to <code>false</code> if not provided.
  *
  * @exportDoc
  */
