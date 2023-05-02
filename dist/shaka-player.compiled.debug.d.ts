@@ -103,6 +103,10 @@ declare namespace shaka {
      */
     drmInfo ( ) : shaka.extern.DrmInfo | null ;
     /**
+     * Returns the active sessions metadata
+     */
+    getActiveSessionsMetadata ( ) : shaka.extern.DrmSessionMetadata [] ;
+    /**
      * Returns a shaka.ads.AdManager instance, responsible for Dynamic
      * Ad Insertion functionality.
      */
@@ -473,7 +477,7 @@ declare namespace shaka.Player {
 }
 // Generated from /Users/sivanagranov/git-test/shaka-player/dist/shaka-player.compiled.debug.externs.js
 declare namespace shaka.abr {
-  class SimpleAbrManager implements shaka.extern.AbrManager {
+  class SimpleAbrManager implements shaka.extern.AbrManager , shaka.util.IReleasable {
     private noStructuralTyping_shaka_abr_SimpleAbrManager : any;
     chooseVariant ( ) : any ;
     configure (config : any ) : any ;
@@ -482,6 +486,7 @@ declare namespace shaka.abr {
     getBandwidthEstimate ( ) : any ;
     init (switchCallback : any ) : any ;
     playbackRateChanged (rate : any ) : any ;
+    release ( ) : any ;
     segmentDownloaded (deltaTimeMs : any , numBytes : any ) : any ;
     setMediaElement (mediaElement : any ) : any ;
     setVariants (variants : any ) : any ;
@@ -805,6 +810,40 @@ declare namespace shaka.cast {
   }
 }
 // Generated from /Users/sivanagranov/git-test/shaka-player/dist/shaka-player.compiled.debug.externs.js
+declare namespace shaka.cea {
+  /**
+   * CEA-X08 captions decoder.
+   */
+  class CeaDecoder implements shaka.extern.ICaptionDecoder {
+    private noStructuralTyping_shaka_cea_CeaDecoder : any;
+    clear ( ) : any ;
+    decode ( ) : shaka.extern.ICaptionDecoder.ClosedCaption [] ;
+    extract (userDataSeiMessage : Uint8Array , pts : number ) : any ;
+  }
+}
+// Generated from /Users/sivanagranov/git-test/shaka-player/dist/shaka-player.compiled.debug.externs.js
+declare namespace shaka.cea {
+  /**
+   * MPEG4 stream parser used for extracting 708 closed captions data.
+   */
+  class Mp4CeaParser implements shaka.extern.ICeaParser {
+    private noStructuralTyping_shaka_cea_Mp4CeaParser : any;
+    init (initSegment : ArrayBuffer | ArrayBufferView ) : any ;
+    parse (mediaSegment : ArrayBuffer | ArrayBufferView ) : shaka.extern.ICeaParser.CaptionPacket [] ;
+  }
+}
+// Generated from /Users/sivanagranov/git-test/shaka-player/dist/shaka-player.compiled.debug.externs.js
+declare namespace shaka.cea {
+  /**
+   * MPEG TS CEA parser.
+   */
+  class TsCeaParser implements shaka.extern.ICeaParser {
+    private noStructuralTyping_shaka_cea_TsCeaParser : any;
+    init (initSegment : ArrayBuffer | ArrayBufferView ) : any ;
+    parse (mediaSegment : ArrayBuffer | ArrayBufferView ) : shaka.extern.ICeaParser.CaptionPacket [] ;
+  }
+}
+// Generated from /Users/sivanagranov/git-test/shaka-player/dist/shaka-player.compiled.debug.externs.js
 declare namespace shaka.config {
   enum AutoShowText {
     ALWAYS = 1.0 ,
@@ -826,6 +865,10 @@ declare namespace shaka.dash {
     stop ( ) : any ;
     update ( ) : any ;
   }
+}
+// Generated from /Users/sivanagranov/git-test/shaka-player/dist/shaka-player.compiled.debug.externs.js
+declare namespace shaka.dash.MpdUtils {
+  type TimeRange = { end : number , start : number , unscaledStart : number } ;
 }
 // Generated from /Users/sivanagranov/git-test/shaka-player/dist/shaka-player.compiled.debug.externs.js
 declare namespace shaka {
@@ -874,6 +917,38 @@ declare namespace shaka.lcevc {
      * Close LCEVC Dil.
      */
     release ( ) : any ;
+  }
+}
+// Generated from /Users/sivanagranov/git-test/shaka-player/dist/shaka-player.compiled.debug.externs.js
+declare namespace shaka.media {
+  /**
+   * Closed Caption Parser provides all operations for parsing the closed captions
+   * embedded in Dash videos streams.
+   */
+  class ClosedCaptionParser implements shaka.media.IClosedCaptionParser {
+    private noStructuralTyping_shaka_media_ClosedCaptionParser : any;
+    /**
+     * Closed Caption Parser provides all operations for parsing the closed captions
+     * embedded in Dash videos streams.
+     */
+    constructor (mimeType : string ) ;
+    static findDecoder ( ) : ( shaka.extern.CaptionDecoderPlugin ) | null ;
+    static findParser (mimeType : string ) : ( shaka.extern.CeaParserPlugin ) | null ;
+    static registerDecoder (plugin : shaka.extern.CaptionDecoderPlugin ) : any ;
+    static registerParser (mimeType : string , plugin : shaka.extern.CeaParserPlugin ) : any ;
+    static unregisterDecoder ( ) : any ;
+    static unregisterParser (mimeType : string ) : any ;
+  }
+}
+// Generated from /Users/sivanagranov/git-test/shaka-player/dist/shaka-player.compiled.debug.externs.js
+declare namespace shaka.media {
+  /**
+   * The IClosedCaptionParser defines the interface to provide all operations for
+   * parsing the closed captions embedded in Dash videos streams.
+   * TODO: Remove this interface and move method definitions
+   * directly to ClosedCaptonParser.
+   */
+  interface IClosedCaptionParser {
   }
 }
 // Generated from /Users/sivanagranov/git-test/shaka-player/dist/shaka-player.compiled.debug.externs.js
@@ -1019,6 +1094,12 @@ declare namespace shaka.media {
      * same stream.
      */
     notifySegments (references : shaka.media.SegmentReference [] ) : any ;
+    /**
+     * Gives PresentationTimeline a Stream's timeline so it can size and position
+     * the segment availability window, and account for missing segment
+     * information.
+     */
+    notifyTimeRange (timeline : shaka.dash.MpdUtils.TimeRange [] , startOffset : number ) : any ;
     /**
      * Offsets the segment times by the given amount.
      * @param offset The number of seconds to offset by.  A positive number adjusts the segment times forward.
@@ -3024,6 +3105,34 @@ declare namespace shaka.util {
 declare namespace shaka.util {
   class TsParser {
     private noStructuralTyping_shaka_util_TsParser : any;
+    /**
+     * Return the audio and video codecs
+     */
+    getCodecs ( ) : { audio : string | null , video : string | null } ;
+    /**
+     * Return the ID3 metadata
+     */
+    getMetadata ( ) : shaka.extern.ID3Metadata [] ;
+    /**
+     * Return the start time for the audio and video
+     */
+    getStartTime ( ) : { audio : number | null , video : number | null } ;
+    /**
+     * Return the video resolution
+     */
+    getVideoResolution ( ) : { height : string | null , width : string | null } ;
+    /**
+     * Parse the given data
+     */
+    parse (data : Uint8Array | null ) : shaka.util.TsParser ;
+    /**
+     * Check if the passed data corresponds to an MPEG2-TS
+     */
+    static probe (data : Uint8Array | null ) : boolean ;
+    /**
+     * Returns the synchronization offset
+     */
+    static syncOffset (data : Uint8Array | null ) : number ;
   }
 }
 // Generated from /Users/sivanagranov/git-test/shaka-player/dist/shaka-player.compiled.debug.externs.js
@@ -3615,6 +3724,10 @@ declare namespace shaka.extern {
      */
     playbackRateChanged (rate : number ) : any ;
     /**
+     * Request that this object release all internal references.
+     */
+    release ( ) : any ;
+    /**
      * Notifies the AbrManager that a segment has been downloaded (includes MP4
      * SIDX data, WebM Cues data, initialization segments, and media segments).
      * @param deltaTimeMs The duration, in milliseconds, that the request took to complete.
@@ -3748,6 +3861,70 @@ declare namespace shaka.extern.IAdManager {
    * A factory for creating the ad manager.
    */
   type Factory = ( ) => shaka.extern.IAdManager ;
+}
+// Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/cea.js
+declare namespace shaka.extern {
+  type CaptionDecoderPlugin = ( ) => shaka.extern.ICaptionDecoder ;
+}
+// Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/cea.js
+declare namespace shaka.extern {
+  type CeaParserPlugin = ( ) => shaka.extern.ICeaParser ;
+}
+// Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/cea.js
+declare namespace shaka.extern {
+  /**
+   * Interface for decoding inband closed captions from packets.
+   */
+  interface ICaptionDecoder {
+    /**
+     * Clears the decoder state completely.
+     * Should be used when an action renders the decoder state invalid,
+     * e.g. unbuffered seeks.
+     */
+    clear ( ) : any ;
+    /**
+     * Decodes all currently extracted packets and then clears them.
+     * This should be called once for a set of extracts (see comment on extract).
+     */
+    decode ( ) : shaka.extern.ICaptionDecoder.ClosedCaption [] ;
+    /**
+     * Extracts packets and prepares them for decoding. In a given media fragment,
+     * all the caption packets found in its SEI messages should be extracted by
+     * successive calls to extract(), followed by a single call to decode().
+     * @param userDataSeiMessage This is a User Data registered by Rec.ITU-T T.35 SEI message. It is described in sections D.1.6 and D.2.6 of Rec. ITU-T H.264 (06/2019).
+     * @param pts PTS when this packet was received, in seconds.
+     */
+    extract (userDataSeiMessage : Uint8Array , pts : number ) : any ;
+  }
+}
+// Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/cea.js
+declare namespace shaka.extern.ICaptionDecoder {
+  /**
+   * Parsed Cue.
+   */
+  type ClosedCaption = { cue : shaka.text.Cue , stream : string } ;
+}
+// Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/cea.js
+declare namespace shaka.extern {
+  /**
+   * Interface for parsing inband closed caption data from MP4 streams.
+   */
+  interface ICeaParser {
+    /**
+     * Initializes the parser with init segment data.
+     * @param initSegment init segment to parse.
+     */
+    init (initSegment : ArrayBuffer | ArrayBufferView ) : any ;
+    /**
+     * Parses the stream and extracts closed captions packets.
+     * @param mediaSegment media segment to parse.
+     */
+    parse (mediaSegment : ArrayBuffer | ArrayBufferView ) : shaka.extern.ICeaParser.CaptionPacket [] ;
+  }
+}
+// Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/cea.js
+declare namespace shaka.extern.ICeaParser {
+  type CaptionPacket = { packet : Uint8Array , pts : number } ;
 }
 // Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/error.js
 declare namespace shaka.extern {
@@ -4191,7 +4368,11 @@ declare namespace shaka.extern {
 }
 // Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/player.js
 declare namespace shaka.extern {
-  type DrmConfiguration = { advanced : { [ key: string ]: shaka.extern.AdvancedDrmConfiguration } | null , clearKeys : { [ key: string ]: string } , delayLicenseRequestUntilPlayed : boolean , initDataTransform ? : (a : Uint8Array , b : string , c : shaka.extern.DrmInfo | null ) => Uint8Array , keySystemsMapping : { [ key: string ]: string } , logLicenseExchange : boolean , minHdcpVersion : string , parseInbandPsshEnabled : boolean , preferredKeySystems : string [] , retryParameters : shaka.extern.RetryParameters , servers : { [ key: string ]: string } , updateExpirationTime : number } ;
+  type DrmConfiguration = { advanced : { [ key: string ]: shaka.extern.AdvancedDrmConfiguration } | null , clearKeys : { [ key: string ]: string } , delayLicenseRequestUntilPlayed : boolean , initDataTransform ? : shaka.extern.InitDataTransform , keySystemsMapping : { [ key: string ]: string } , logLicenseExchange : boolean , minHdcpVersion : string , parseInbandPsshEnabled : boolean , persistentSessionOnlinePlayback : boolean , persistentSessionsMetadata : shaka.extern.PersistentSessionMetadata [] , preferredKeySystems : string [] , retryParameters : shaka.extern.RetryParameters , servers : { [ key: string ]: string } , updateExpirationTime : number } ;
+}
+// Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/player.js
+declare namespace shaka.extern {
+  type DrmSessionMetadata = { initData : Uint8Array | null , initDataType : string | null , sessionId : string , sessionType : string } ;
 }
 // Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/player.js
 declare namespace shaka.extern {
@@ -4211,6 +4392,10 @@ declare namespace shaka.extern {
 }
 // Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/player.js
 declare namespace shaka.extern {
+  type InitDataTransform = (a : Uint8Array , b : string , c : shaka.extern.DrmInfo | null ) => Uint8Array ;
+}
+// Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/player.js
+declare namespace shaka.extern {
   type LanguageRole = { label : string | null , language : string , role : string } ;
 }
 // Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/player.js
@@ -4219,7 +4404,7 @@ declare namespace shaka.extern {
 }
 // Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/player.js
 declare namespace shaka.extern {
-  type ManifestConfiguration = { availabilityWindowOverride : number , dash : shaka.extern.DashManifestConfiguration , defaultPresentationDelay : number , disableAudio : boolean , disableText : boolean , disableThumbnails : boolean , disableVideo : boolean , hls : shaka.extern.HlsManifestConfiguration , mss : shaka.extern.MssManifestConfiguration , retryParameters : shaka.extern.RetryParameters , segmentRelativeVttTiming : boolean } ;
+  type ManifestConfiguration = { availabilityWindowOverride : number , dash : shaka.extern.DashManifestConfiguration , defaultPresentationDelay : number , disableAudio : boolean , disableText : boolean , disableThumbnails : boolean , disableVideo : boolean , hls : shaka.extern.HlsManifestConfiguration , mss : shaka.extern.MssManifestConfiguration , raiseFatalErrorOnManifestUpdateRequestFailure : boolean , retryParameters : shaka.extern.RetryParameters , segmentRelativeVttTiming : boolean } ;
 }
 // Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/player.js
 declare namespace shaka.extern {
@@ -4244,6 +4429,10 @@ declare namespace shaka.extern {
 // Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/player.js
 declare namespace shaka.extern {
   type OfflineConfiguration = { downloadSizeCallback : (a : number ) => Promise < boolean > , numberOfParallelDownloads : number , progressCallback : (a : shaka.extern.StoredContent , b : number ) => any , trackSelectionCallback : (a : shaka.extern.TrackList ) => Promise < shaka.extern.TrackList > , usePersistentLicense : boolean } ;
+}
+// Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/player.js
+declare namespace shaka.extern {
+  type PersistentSessionMetadata = { initData : Uint8Array | null , initDataType : string | null , sessionId : string } ;
 }
 // Generated from /Users/sivanagranov/git-test/shaka-player/externs/shaka/player.js
 declare namespace shaka.extern {
