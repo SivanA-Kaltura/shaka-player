@@ -20,8 +20,6 @@ shaka.ads = {};
 /** @const */
 shaka.cast = {};
 /** @const */
-shaka.cea = {};
-/** @const */
 shaka.config = {};
 /** @const */
 shaka.dash = {};
@@ -590,95 +588,6 @@ shaka.ui.Localization.LOCALE_CHANGED;
  */
 shaka.ui.Localization.LOCALE_UPDATED;
 /**
- * @summary A set of BufferSource utility functions.
- */
-shaka.util.BufferUtils = class {
-  /**
-   * Compare two buffers for equality.  For buffers of different types, this
-   * compares the underlying buffers as binary data.
-   * @param {?BufferSource} arr1
-   * @param {?BufferSource} arr2
-   * @return {boolean}
-   * @suppress {strictMissingProperties}
-   */
-  static equal(arr1, arr2) {}
-  /**
-   * Gets an ArrayBuffer that contains the data from the given TypedArray.  Note
-   * this will allocate a new ArrayBuffer if the object is a partial view of
-   * the data.
-   * @param {!BufferSource} view
-   * @return {!ArrayBuffer}
-   */
-  static toArrayBuffer(view) {}
-  /**
-   * Creates a new Uint8Array view on the same buffer.  This clamps the values
-   * to be within the same view (i.e. you can't use this to move past the end
-   * of the view, even if the underlying buffer is larger).  However, you can
-   * pass a negative offset to access the data before the view.
-   * @param {BufferSource} data
-   * @param {number=} offset The offset from the beginning of this data's view
-   *   to start the new view at.
-   * @param {number=} length The byte length of the new view.
-   * @return {!Uint8Array}
-   */
-  static toUint8(data, offset, length) {}
-  /**
-   * Creates a DataView over the given buffer.
-   * @see toUint8
-   * @param {BufferSource} buffer
-   * @param {number=} offset
-   * @param {number=} length
-   * @return {!DataView}
-   */
-  static toDataView(buffer, offset, length) {}
-};
-/**
- * The IClosedCaptionParser defines the interface to provide all operations for
- * parsing the closed captions embedded in Dash videos streams.
- * TODO: Remove this interface and move method definitions
- * directly to ClosedCaptonParser.
- * @interface
- */
-shaka.media.IClosedCaptionParser = class {
-};
-/**
- * Closed Caption Parser provides all operations for parsing the closed captions
- * embedded in Dash videos streams.
- * @implements {shaka.media.IClosedCaptionParser}
- * @final
- */
-shaka.media.ClosedCaptionParser = class {
-  /**
-   * @param {string} mimeType
-   */
-  constructor(mimeType) {}
-  /**
-   * @param {string} mimeType
-   * @param {!shaka.extern.CeaParserPlugin} plugin
-   */
-  static registerParser(mimeType, plugin) {}
-  /**
-   * @param {string} mimeType
-   */
-  static unregisterParser(mimeType) {}
-  /**
-   * @param {string} mimeType
-   * @return {?shaka.extern.CeaParserPlugin}
-   */
-  static findParser(mimeType) {}
-  /**
-   * @param {!shaka.extern.CaptionDecoderPlugin} plugin
-   */
-  static registerDecoder(plugin) {}
-  /**
-   */
-  static unregisterDecoder() {}
-  /**
-   * @return {?shaka.extern.CaptionDecoderPlugin}
-   */
-  static findDecoder() {}
-};
-/**
  * @implements {shaka.extern.Cue}
  */
 shaka.text.Cue = class {
@@ -1016,6 +925,49 @@ shaka.text.CueRegion.units = {
 shaka.text.CueRegion.scrollMode = {
   'NONE': '',
   'UP': 'up'
+};
+/**
+ * @summary A set of BufferSource utility functions.
+ */
+shaka.util.BufferUtils = class {
+  /**
+   * Compare two buffers for equality.  For buffers of different types, this
+   * compares the underlying buffers as binary data.
+   * @param {?BufferSource} arr1
+   * @param {?BufferSource} arr2
+   * @return {boolean}
+   * @suppress {strictMissingProperties}
+   */
+  static equal(arr1, arr2) {}
+  /**
+   * Gets an ArrayBuffer that contains the data from the given TypedArray.  Note
+   * this will allocate a new ArrayBuffer if the object is a partial view of
+   * the data.
+   * @param {!BufferSource} view
+   * @return {!ArrayBuffer}
+   */
+  static toArrayBuffer(view) {}
+  /**
+   * Creates a new Uint8Array view on the same buffer.  This clamps the values
+   * to be within the same view (i.e. you can't use this to move past the end
+   * of the view, even if the underlying buffer is larger).  However, you can
+   * pass a negative offset to access the data before the view.
+   * @param {BufferSource} data
+   * @param {number=} offset The offset from the beginning of this data's view
+   *   to start the new view at.
+   * @param {number=} length The byte length of the new view.
+   * @return {!Uint8Array}
+   */
+  static toUint8(data, offset, length) {}
+  /**
+   * Creates a DataView over the given buffer.
+   * @see toUint8
+   * @param {BufferSource} buffer
+   * @param {number=} offset
+   * @param {number=} length
+   * @return {!DataView}
+   */
+  static toDataView(buffer, offset, length) {}
 };
 /**
  * An interface to standardize how objects are destroyed.
@@ -1877,6 +1829,74 @@ shaka.media.ManifestParser = class {
   static unregisterParserByMime(mimeType) {}
 };
 /**
+ * @summary
+ * Parser for exponential Golomb codes, a variable-bitwidth number encoding
+ * scheme used by h264.
+ * Based on https://github.com/videojs/mux.js/blob/main/lib/utils/exp-golomb.js
+ */
+shaka.util.ExpGolomb = class {
+  /**
+   * @param {!Uint8Array} data
+   */
+  constructor(data) {}
+};
+/**
+ * @summary A set of Id3Utils utility functions.
+ */
+shaka.util.Id3Utils = class {
+  /**
+   * Returns an array of ID3 frames found in all the ID3 tags in the id3Data
+   * @param {Uint8Array} id3Data - The ID3 data containing one or more ID3 tags
+   * @return {!Array.<shaka.extern.MetadataFrame>}
+   */
+  static getID3Frames(id3Data) {}
+};
+/**
+ * @see https://en.wikipedia.org/wiki/MPEG_transport_stream
+ */
+shaka.util.TsParser = class {
+  /** */
+  constructor() {}
+  /**
+   * Parse the given data
+   * @param {Uint8Array} data
+   * @return {!shaka.util.TsParser}
+   */
+  parse(data) {}
+  /**
+   * Return the ID3 metadata
+   * @return {!Array.<shaka.extern.ID3Metadata>}
+   */
+  getMetadata() {}
+  /**
+   * Return the start time for the audio and video
+   * @return {{audio: ?number, video: ?number}}
+   */
+  getStartTime() {}
+  /**
+   * Return the audio and video codecs
+   * @return {{audio: ?string, video: ?string}}
+   */
+  getCodecs() {}
+  /**
+   * Return the video resolution
+   * @return {{height: ?string, width: ?string}}
+   */
+  getVideoResolution() {}
+  /**
+   * Check if the passed data corresponds to an MPEG2-TS
+   * @param {Uint8Array} data
+   * @return {boolean}
+   */
+  static probe(data) {}
+  /**
+   * Returns the synchronization offset
+   * @param {Uint8Array} data
+   * @return {number}
+   */
+  static syncOffset(data) {}
+};
+/**
  * Creates an InitSegmentReference, which provides the location to an
  * initialization segment.
  */
@@ -2069,74 +2089,6 @@ shaka.media.SegmentReference.Status = {
  *    The thumbnail width in px.
  */
 shaka.media.SegmentReference.ThumbnailSprite;
-/**
- * @summary A set of Id3Utils utility functions.
- */
-shaka.util.Id3Utils = class {
-  /**
-   * Returns an array of ID3 frames found in all the ID3 tags in the id3Data
-   * @param {Uint8Array} id3Data - The ID3 data containing one or more ID3 tags
-   * @return {!Array.<shaka.extern.MetadataFrame>}
-   */
-  static getID3Frames(id3Data) {}
-};
-/**
- * @summary
- * Parser for exponential Golomb codes, a variable-bitwidth number encoding
- * scheme used by h264.
- * Based on https://github.com/videojs/mux.js/blob/main/lib/utils/exp-golomb.js
- */
-shaka.util.ExpGolomb = class {
-  /**
-   * @param {!Uint8Array} data
-   */
-  constructor(data) {}
-};
-/**
- * @see https://en.wikipedia.org/wiki/MPEG_transport_stream
- */
-shaka.util.TsParser = class {
-  /** */
-  constructor() {}
-  /**
-   * Parse the given data
-   * @param {Uint8Array} data
-   * @return {!shaka.util.TsParser}
-   */
-  parse(data) {}
-  /**
-   * Return the ID3 metadata
-   * @return {!Array.<shaka.extern.ID3Metadata>}
-   */
-  getMetadata() {}
-  /**
-   * Return the start time for the audio and video
-   * @return {{audio: ?number, video: ?number}}
-   */
-  getStartTime() {}
-  /**
-   * Return the audio and video codecs
-   * @return {{audio: ?string, video: ?string}}
-   */
-  getCodecs() {}
-  /**
-   * Return the video resolution
-   * @return {{height: ?string, width: ?string}}
-   */
-  getVideoResolution() {}
-  /**
-   * Check if the passed data corresponds to an MPEG2-TS
-   * @param {Uint8Array} data
-   * @return {boolean}
-   */
-  static probe(data) {}
-  /**
-   * Returns the synchronization offset
-   * @param {Uint8Array} data
-   * @return {number}
-   */
-  static syncOffset(data) {}
-};
 /**
  * @summary
  *  lcevcDil - (MPEG-5 Part 2 LCEVC - Decoder Integration Layer) provides
@@ -3976,30 +3928,6 @@ shaka.cast.CastReceiver = class extends shaka.util.FakeEventTarget {
    * @override
    */
   destroy() {}
-};
-/**
- * CEA-X08 captions decoder.
- * @implements {shaka.extern.ICaptionDecoder}
- */
-shaka.cea.CeaDecoder = class {
-  /** */
-  constructor() {}
-};
-/**
- * MPEG4 stream parser used for extracting 708 closed captions data.
- * @implements {shaka.extern.ICeaParser}
- */
-shaka.cea.Mp4CeaParser = class {
-  /** */
-  constructor() {}
-};
-/**
- * MPEG TS CEA parser.
- * @implements {shaka.extern.ICeaParser}
- */
-shaka.cea.TsCeaParser = class {
-  /** */
-  constructor() {}
 };
 /**
  * Creates a new DASH parser.
